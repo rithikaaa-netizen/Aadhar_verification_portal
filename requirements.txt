@@ -1,0 +1,12 @@
+flask
+werkzeug
+torch
+torchvision
+easyocr
+mysql-connector-python
+numpy
+opencv-python-headless
+pandas
+pytest
+gunicorn
+ultralytics

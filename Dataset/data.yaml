@@ -1,0 +1,12 @@
+train: ../Aadhar_card_fraud_detection_main/Dataset/train/images
+val: ../Aadhar_card_fraud_detection_main/Dataset/valid/images
+
+nc: 2
+names: ['fake', 'real']
+
+roboflow:
+  workspace: api-armle
+  project: aadhar-card-guvdr
+  version: 2
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/api-armle/aadhar-card-guvdr/dataset/2

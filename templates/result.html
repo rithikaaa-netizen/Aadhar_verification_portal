@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verification Result | Aadhaar Authentication System</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      background: radial-gradient(circle at 10% 20%, #e9efff 0%, #f8fafc 90%);
+      min-height: 100vh;
+      letter-spacing: -0.01em;
+    }
+    
+    .card {
+      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.08);
+      border-radius: 20px;
+      overflow: hidden;
+      backdrop-filter: blur(20px);
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      font-weight: 600;
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(99, 102, 241, 0.35);
+      background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+    }
+    
+    .verified-badge {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.25);
+    }
+    
+    .rejected-badge {
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      box-shadow: 0 4px 15px rgba(239, 68, 68, 0.25);
+    }
+    
+    .text-gradient {
+      background: linear-gradient(135deg, #1e40af 0%, #3730a3 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-weight: 700;
+    }
+    
+    .section-title {
+      font-weight: 600;
+      color: #1e293b;
+    }
+    
+    .info-card {
+      background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+      border: 1px solid #e2e8f0;
+      transition: all 0.2s ease;
+    }
+    
+    .info-card:hover {
+      border-color: #cbd5e1;
+      transform: translateY(-1px);
+    }
+    
+    .confidence-score {
+      font-weight: 700;
+      color: #1e293b;
+      font-size: 1.125rem;
+    }
+    
+    .ocr-textarea {
+      font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+      line-height: 1.5;
+      font-size: 0.875rem;
+    }
+    
+    .status-badge {
+      font-weight: 600;
+      font-size: 0.75rem;
+      letter-spacing: 0.025em;
+    }
+    
+    .document-preview {
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+      border-radius: 16px;
+      padding: 16px;
+    }
+    
+    .progress-bar {
+      height: 8px;
+      border-radius: 4px;
+      background-color: #e2e8f0;
+      overflow: hidden;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.5s ease-in-out;
+      width: var(--confidence-width, 0%);
+    }
+    
+    .confidence-high {
+      background: linear-gradient(90deg, #10b981 0%, #34d399 100%);
+    }
+    
+    .confidence-medium {
+      background: linear-gradient(90deg, #f59e0b 0%, #fbbf24 100%);
+    }
+    
+    .confidence-low {
+      background: linear-gradient(90deg, #ef4444 0%, #f87171 100%);
+    }
+  </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4 md:p-6">
+  <div class="bg-white/80 backdrop-blur-md border border-slate-200/60 card w-full max-w-5xl p-6 md:p-8 lg:p-10">
+    <!-- Header -->
+    <div class="text-center mb-10">
+      <h1 class="text-3xl md:text-4xl font-bold tracking-tight text-gradient mb-4">Document Analysis Complete</h1>
+      <p class="text-slate-600 text-lg max-w-2xl mx-auto leading-relaxed">
+        Comprehensive authenticity assessment of your Aadhaar document
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 xl:grid-cols-2 gap-8 md:gap-10">
+      <!-- Document Preview -->
+      <div class="flex flex-col">
+        <div class="flex items-center mb-6">
+          <div class="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center mr-4">
+            <svg class="w-6 h-6 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+            </svg>
+          </div>
+          <h2 class="section-title text-xl md:text-2xl">Document Preview</h2>
+        </div>
+        
+        <div class="document-preview w-full flex-1">
+          <div class="aspect-w-4 aspect-h-3 bg-white rounded-xl overflow-hidden border border-slate-200 shadow-sm">
+            <img src="{{ url_for('uploaded_file', filename=image_filename) }}" alt="Uploaded Aadhaar Card" class="w-full h-full object-contain rounded-lg">
+          </div>
+          <p class="text-slate-500 text-sm mt-4 text-center">Submitted document for verification</p>
+        </div>
+      </div>
+
+      <!-- Results Section -->
+      <div class="space-y-8">
+        <!-- Verdict -->
+        <div>
+          <div class="flex items-center mb-6">
+            <div class="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center mr-4">
+              <svg class="w-6 h-6 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+              </svg>
+            </div>
+            <h2 class="section-title text-xl md:text-2xl">Authentication Verdict</h2>
+          </div>
+          
+          {% if verdict == 'Verified' %}
+          <div class="verified-badge text-white rounded-2xl p-6 flex items-center">
+            <div class="bg-white bg-opacity-25 p-3 rounded-xl mr-5">
+              <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+            </div>
+            <div>
+              <p class="font-bold text-2xl mb-2">Verified & Authentic</p>
+              <p class="opacity-95 text-base">This document has passed all authenticity checks and appears to be genuine.</p>
+            </div>
+          </div>
+          {% else %}
+          <div class="rejected-badge text-white rounded-2xl p-6 flex items-center">
+            <div class="bg-white bg-opacity-25 p-3 rounded-xl mr-5">
+              <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </div>
+            <div>
+              <p class="font-bold text-xl mb-1">Verification Failed</p>
+              <p class="opacity-95 text-sm leading-relaxed">This document could not be verified as authentic. Please check the document quality.</p>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- Verification Details -->
+        <div class="space-y-6">
+          <div class="flex items-center">
+            <div class="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center mr-4">
+              <svg class="w-6 h-6 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <h3 class="section-title text-xl">Analysis Details</h3>
+          </div>
+          
+          <div class="grid grid-cols-1 gap-4">
+            <div class="info-card rounded-xl p-5 flex justify-between items-center">
+              <div>
+                <p class="text-slate-600 font-medium text-sm uppercase tracking-wide mb-1">AI Classification</p>
+                <p class="text-slate-800 font-semibold">{{ label.capitalize() }}</p>
+              </div>
+              <span class="status-badge bg-slate-100 text-slate-700 px-3 py-1.5 rounded-full">{{ label.capitalize() }}</span>
+            </div>
+            
+            <div class="info-card rounded-xl p-5">
+              <div class="flex justify-between items-center mb-3">
+                <div>
+                  <p class="text-slate-600 font-medium text-sm uppercase tracking-wide mb-1">Confidence Level</p>
+                  <p class="text-slate-800 font-semibold">AI Model Certainty</p>
+                </div>
+                <span class="confidence-score">{{ '%.1f' % (confidence * 100) }}%</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill 
+                  {% if confidence > 0.7 %}confidence-high
+                  {% elif confidence > 0.4 %}confidence-medium
+                  {% else %}confidence-low
+                  {% endif %}" 
+                  style="--confidence-width: {{ confidence * 100 }}%">
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Updated OCR Details Section -->
+          <div class="info-card rounded-xl p-5">
+            <p class="text-slate-600 font-medium text-sm uppercase tracking-wide mb-3">Extracted Details</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <p class="text-slate-500 text-xs mb-1">Name</p>
+                <p class="text-slate-800 font-semibold">{{ text.get('Name', 'N/A') }}</p>
+              </div>
+              <div>
+                <p class="text-slate-500 text-xs mb-1">Date of Birth</p>
+                <p class="text-slate-800 font-semibold">{{ text.get('DOB', 'N/A') }}</p>
+              </div>
+              <div>
+                <p class="text-slate-500 text-xs mb-1">Gender</p>
+                <p class="text-slate-800 font-semibold">{{ text.get('Gender', 'N/A') }}</p>
+              </div>
+              <div>
+                <p class="text-slate-500 text-xs mb-1">Aadhaar Number</p>
+                <p class="text-slate-800 font-semibold">{{ text.get('AadhaarNumber', 'N/A') }}</p>
+              </div>
+            </div>
+            <p class="text-slate-500 text-xs mt-2">OCR analysis results from document scanning</p>
+          </div>
+        </div>
+
+        <!-- Action Button -->
+        <div class="text-center pt-6">
+          <a href="{{ url_for('index') }}" class="btn-primary inline-flex items-center text-white font-semibold py-4 px-10 rounded-xl text-lg transition-all">
+            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+            </svg>
+            Analyze Another Document
+          </a>
+          <p class="text-slate-500 text-sm mt-4">All data is processed securely and encrypted during transmission</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

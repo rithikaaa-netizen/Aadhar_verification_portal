@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aadhaar Verification Portal</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Sans:wght@400;500;700&display=swap');
+    body {
+      font-family: 'Inter', sans-serif;
+      background: radial-gradient(circle at 10% 20%, #e9efff 0%, #f8fafc 90%);
+      min-height: 100vh;
+    }
+  </style>
+</head>
+<body class="flex items-center justify-center px-6 py-10">
+
+  <!-- Card -->
+  <div class="bg-white/80 backdrop-blur-md border border-slate-200/70 shadow-xl rounded-2xl w-full max-w-2xl p-12 transition-all">
+    <!-- Header -->
+    <div class="text-center mb-10">
+      <h1 class="text-3xl md:text-4xl font-bold text-slate-800 tracking-tight">Aadhaar Verification Portal</h1>
+      <p class="text-slate-600 text-base md:text-lg mt-2">AI-powered document authenticity check</p>
+    </div>
+
+    <!-- Upload Form -->
+    <form id="upload-form" action="/upload" method="POST" enctype="multipart/form-data" class="space-y-6">
+      <!-- Upload Zone -->
+      <div id="drop-area" class="border-2 border-dashed border-slate-300 rounded-2xl p-10 md:p-12 text-center cursor-pointer bg-white hover:border-indigo-400 transition-all duration-300">
+        <input type="file" id="file-input" name="file" accept="image/*" class="hidden" />
+        <div id="placeholder">
+          <svg class="mx-auto h-16 w-16 md:h-20 md:w-20 text-slate-400 mb-4" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.2-3.2a4 4 0 00-5.6 0L28 28M8 32l9.2-9.2a4 4 0 015.6 0L28 28m0 0l4 4m4-24h8m-4-4v8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+          <p class="text-slate-600 text-base md:text-lg mb-2">
+            <span class="font-medium text-indigo-600">Click to upload</span> or drag & drop
+          </p>
+          <p class="text-sm md:text-base text-slate-400">PNG, JPG, JPEG (max 16MB)</p>
+        </div>
+        <div id="preview" class="hidden">
+          <img id="image-preview" src="#" alt="Preview" class="max-h-60 md:max-h-72 mx-auto rounded-lg border border-slate-200 shadow-sm" />
+          <p id="filename" class="text-base md:text-lg mt-3 text-slate-700 font-medium truncate"></p>
+        </div>
+      </div>
+
+      <!-- Button -->
+      <button id="submit-btn" type="submit"
+        class="w-full bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white font-semibold py-4 md:py-5 rounded-2xl text-lg md:text-xl transition-all shadow-md hover:shadow-lg disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center">
+        <span id="btn-text">Verify Document</span>
+        <span id="spinner" class="hidden">
+          <svg class="animate-spin h-5 w-5 md:h-6 md:w-6 text-white inline-block mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0a12 12 0 00-12 12h4zm2 5.3A8 8 0 014 12H0a12 12 0 003 7.9l3-2.6z"></path>
+          </svg>
+          Processing...
+        </span>
+      </button>
+    </form>
+
+    <!-- Security Note -->
+    <div class="mt-8 text-center">
+      <p class="text-sm md:text-base text-slate-500 flex items-center justify-center">
+        <svg class="w-5 h-5 md:w-6 md:h-6 mr-2 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+        </svg>
+        All data is securely encrypted and processed
+      </p>
+    </div>
+  </div>
+
+  <!-- Script -->
+  <script>
+    const dropArea = document.getElementById('drop-area');
+    const fileInput = document.getElementById('file-input');
+    const placeholder = document.getElementById('placeholder');
+    const preview = document.getElementById('preview');
+    const imagePreview = document.getElementById('image-preview');
+    const filenameDisplay = document.getElementById('filename');
+    const uploadForm = document.getElementById('upload-form');
+    const submitBtn = document.getElementById('submit-btn');
+    const btnText = document.getElementById('btn-text');
+    const spinner = document.getElementById('spinner');
+
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+      dropArea.addEventListener(eventName, e => { e.preventDefault(); e.stopPropagation(); });
+    });
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+      dropArea.addEventListener(eventName, () => dropArea.classList.add('ring-2', 'ring-indigo-300'));
+    });
+    ['dragleave', 'drop'].forEach(eventName => {
+      dropArea.addEventListener(eventName, () => dropArea.classList.remove('ring-2', 'ring-indigo-300'));
+    });
+
+    dropArea.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', () => handleFiles(fileInput.files));
+    dropArea.addEventListener('drop', e => handleFiles(e.dataTransfer.files));
+
+    function handleFiles(files) {
+      if (files.length > 0) {
+        const file = files[0];
+        if (file.type.startsWith('image/')) {
+          const reader = new FileReader();
+          reader.onload = e => {
+            imagePreview.src = e.target.result;
+            placeholder.classList.add('hidden');
+            preview.classList.remove('hidden');
+            filenameDisplay.textContent = file.name;
+          };
+          reader.readAsDataURL(file);
+        } else alert('Please upload an image file (PNG, JPG, JPEG).');
+      }
+    }
+
+    uploadForm.addEventListener('submit', e => {
+      if (fileInput.files.length === 0) {
+        e.preventDefault();
+        alert("Please select an image before submitting.");
+        return;
+      }
+      submitBtn.disabled = true;
+      btnText.classList.add('hidden');
+      spinner.classList.remove('hidden');
+    });
+  </script>
+
+</body>
+</html>
