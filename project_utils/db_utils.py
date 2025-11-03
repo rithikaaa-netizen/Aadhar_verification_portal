@@ -5,7 +5,7 @@ from mysql.connector import Error
 DB_CONFIG = {
     'host': 'localhost',
     'user': 'root',
-    'password': '',
+    'password': 'RITHIkap2006',
     'database': 'aadhaar_verification'
 }
 def get_db_connection():
